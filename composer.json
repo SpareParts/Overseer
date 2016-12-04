@@ -1,0 +1,23 @@
+{
+    "name":        "spareparts/overseer",
+    "description": "Attribute-based authorization manager.",
+    "keywords":    ["acl", "attribute authorization", "authorization manager"],
+    "license":     "MIT",
+    "require": {
+        "php":  ">=5.5.0",
+        "phpunit/phpunit": "~4"
+    },
+    "require-dev": {
+        "mockery/mockery": "^0.9.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "SpareParts\\Overseer\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SpareParts\\Overseer\\Tests\\": "tests"
+        }
+    }
+}
