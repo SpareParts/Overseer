@@ -78,6 +78,9 @@ class VotingAssembly implements IVotingAssembly
 			case Strategy::ALLOW_UNLESS_DENIED:
 				return $this->strategyAllowUnlessDenied($votingSubject, $votingContext);
 
+			case Strategy::DENY_UNLESS_ALLOWED:
+				return $this->strategyDenyUnlessAllowed($votingSubject, $votingContext);
+
 			default:
 				throw new InvalidVotingResultException('Unable to decide on result, invalid strategy: '.$this->strategy);
 		}
@@ -102,9 +105,49 @@ class VotingAssembly implements IVotingAssembly
 
 
 	/**
+	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
+	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @return \SpareParts\Overseer\IVotingResult
+	 */
+	private function strategyAllowUnlessDenied($votingSubject, $votingContext)
+	{
+		foreach ($this->voters as $name => $voter) {
+			if (($result = $voter->vote($votingSubject, $votingContext)) !== null) {
+				$vote = $this->prepareResult($name, $result);
+				// at least one voter denied access
+				if (!$vote->isAllowed()) {
+					return $vote;
+				}
+			}
+		}
+		return new VotingResult(IVotingResult::ALLOW);
+	}
+
+
+	/**
+	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
+	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @return \SpareParts\Overseer\IVotingResult
+	 */
+	private function strategyDenyUnlessAllowed($votingSubject, $votingContext)
+	{
+		foreach ($this->voters as $name => $voter) {
+			if (($result = $voter->vote($votingSubject, $votingContext)) !== null) {
+				$vote = $this->prepareResult($name, $result);
+				// at least one voter allowed access
+				if ($vote->isAllowed()) {
+					return $vote;
+				}
+			}
+		}
+		return new VotingResult(IVotingResult::DENY);
+	}
+
+
+	/**
 	 * @param string $voterName
 	 * @param string|IVotingResult $partialResult
-	 * @return \SpareParts\Overseer\VotingResult|null
+	 * @return \SpareParts\Overseer\IVotingResult|null
 	 * @throws \SpareParts\Overseer\InvalidVotingResultException
 	 */
 	protected function prepareResult($voterName, $partialResult)
@@ -119,17 +162,6 @@ class VotingAssembly implements IVotingAssembly
 			throw new InvalidVotingResultException('Expected bool or IVotingResult, got '.(string)$partialResult);
 		}
 		return $partialResult;
-	}
-
-
-	private function strategyAllowUnlessDenied($votingSubject, $votingContext)
-	{
-		foreach ($this->voters as $name => $voter) {
-			if (($result = $voter->vote($votingSubject, $votingContext)) !== null) {
-				return $this->prepareResult($name, $result);
-			}
-		}
-		throw new InvalidVotingResultException('Voting assembly did not decide on any result!');
 	}
 
 

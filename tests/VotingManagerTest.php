@@ -2,11 +2,9 @@
 namespace SpareParts\Overseer\Tests;
 
 use SpareParts\Overseer\Assembly\IVotingAssembly;
-use SpareParts\Overseer\Assembly\VotingAssembly;
 use SpareParts\Overseer\GenericVotingManager;
 use SpareParts\Overseer\Identity\IVotingContext;
 use SpareParts\Overseer\IVotingResult;
-use SpareParts\Overseer\Strategy;
 use SpareParts\Overseer\Voter\IVotingSubject;
 use SpareParts\Overseer\Voter\VotingSubject;
 
@@ -66,6 +64,28 @@ class GenericVotingManagerTest extends \PHPUnit_Framework_TestCase
 		$manager = new GenericVotingManager($assemblies);
 		$r = $manager->vote($action, $subject, $context);
 		$this->assertSame($result, $r);
+	}
+
+	/**
+	 * @test
+	 * @expectedException \SpareParts\Overseer\InvalidVotingResultException
+	 */
+	public function noValidAssemblyMeansException()
+	{
+		$subject = $this->prepareSubject('Category');
+		$action = 'edit';
+		$context = $this->prepareContext(12, ['editor', 'user']);
+		$assemblies = [
+			$a1 = \Mockery::mock(IVotingAssembly::class)
+				->shouldReceive('canVoteOn')->with($action, $subject, $context)->andReturn(false)->getMock()
+				->shouldNotReceive('commenceVote')->getMock(),
+			$a2 = \Mockery::mock(IVotingAssembly::class)
+				->shouldReceive('canVoteOn')->with($action, $subject, $context)->andReturn(false)->getMock()
+				->shouldNotReceive('commenceVote')->getMock(),
+		];
+
+		$manager = new GenericVotingManager($assemblies);
+		$r = $manager->vote($action, $subject, $context);
 	}
 
 

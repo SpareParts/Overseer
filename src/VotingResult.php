@@ -7,7 +7,7 @@ use SpareParts\Overseer\Voter\IVoter;
 class VotingResult implements IVotingResult
 {
 	/**
-	 * @var string
+	 * @var string|null
 	 */
 	private $reason;
 
@@ -20,9 +20,9 @@ class VotingResult implements IVotingResult
 	/**
 	 * VotingResult constructor.
 	 * @param string $status
-	 * @param string $reason
+	 * @param string|null $reason
 	 */
-	public function __construct($status, $reason)
+	public function __construct($status, $reason = null)
 	{
 		$this->reason = $reason;
 		$this->status = $status;

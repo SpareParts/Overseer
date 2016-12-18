@@ -9,7 +9,7 @@ use SpareParts\Overseer\IVotingResult;
 class RoleVoter implements IVoter
 {
 	/**
-	 * @var
+	 * @var string[]
 	 */
 	private $allowedRoles;
 
@@ -22,7 +22,7 @@ class RoleVoter implements IVoter
 	/**
 	 * RoleVoter constructor.
 	 * @param string $purpose
-	 * @param string[] $allowedRoles
+	 * @param string|string[] $allowedRoles
 	 */
 	public function __construct($purpose, $allowedRoles)
 	{
@@ -31,7 +31,7 @@ class RoleVoter implements IVoter
 		}
 
 		$this->purpose = $purpose;
-		$this->allowedRoles = $allowedRoles;
+		$this->allowedRoles = (array) $allowedRoles;
 	}
 
 
