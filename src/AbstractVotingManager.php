@@ -2,9 +2,8 @@
 namespace SpareParts\Overseer;
 
 use SpareParts\Overseer\Assembly\IVotingAssembly;
-use SpareParts\Overseer\Identity\IVotingContext;
+use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\Voter\IVotingSubject;
-use SpareParts\Overseer\Voter\VotingSubject;
 
 abstract class AbstractVotingManager
 {
@@ -26,16 +25,13 @@ abstract class AbstractVotingManager
 
 	/**
 	 * @param string $action
-	 * @param \SpareParts\Overseer\Voter\IVotingSubject|mixed $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
 	 * @return \SpareParts\Overseer\IVotingResult
 	 * @throws \SpareParts\Overseer\InvalidVotingResultException
 	 */
-	protected function innerVote($action, $votingSubject, IVotingContext $votingContext)
+	protected function innerVote($action, IVotingSubject $votingSubject, IVotingContext $votingContext)
 	{
-		if (!($votingSubject instanceof IVotingSubject)) {
-			$votingSubject = new VotingSubject($votingSubject);
-		}
 		foreach ($this->votingAssemblies as $votingAssembly) {
 			if ($votingAssembly->canVoteOn($action, $votingSubject, $votingContext)) {
 				return $votingAssembly->commenceVote($votingSubject, $votingContext);

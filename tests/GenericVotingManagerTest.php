@@ -3,7 +3,7 @@ namespace SpareParts\Overseer\Tests;
 
 use SpareParts\Overseer\Assembly\IVotingAssembly;
 use SpareParts\Overseer\GenericVotingManager;
-use SpareParts\Overseer\Identity\IVotingContext;
+use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\IVotingResult;
 use SpareParts\Overseer\Voter\IVotingSubject;
 use SpareParts\Overseer\Voter\VotingSubject;

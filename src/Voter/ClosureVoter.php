@@ -3,10 +3,11 @@
 namespace SpareParts\Overseer\Voter;
 
 
-use SpareParts\Overseer\Identity\IVotingContext;
+use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\IVotingResult;
+use SpareParts\Overseer\VotingDecisionEnum;
 
-class ClosureVoter implements IVoter
+final class ClosureVoter implements IVoter
 {
 	/**
 	 * @var \Closure
@@ -26,12 +27,36 @@ class ClosureVoter implements IVoter
 
 	/**
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
-	 * @return bool|IVotingResult
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+	 * @return ISingleVoterResult
 	 */
 	public function vote(IVotingSubject $votingSubject, IVotingContext $votingContext)
 	{
 		$closure = $this->authorizationClosure;
-		return $closure($votingSubject, $votingContext);
+		$result = $closure($votingSubject, $votingContext);
+
+        $result = $this->prepareResult($result);
+
+        return $result;
 	}
+
+
+	/**
+     * @param mixed $result
+     * @return SingleVoterResult
+     */
+    public function prepareResult($result)
+    {
+        if ($result === true) {
+            $result = new SingleVoterResult(VotingDecisionEnum::ALLOWED());
+            return $result;
+        } elseif ($result === false) {
+            $result = new SingleVoterResult(VotingDecisionEnum::DENIED());
+            return $result;
+        } elseif ($result instanceof VotingDecisionEnum) {
+            $result = new SingleVoterResult($result);
+            return $result;
+        }
+        return $result;
+    }
 }

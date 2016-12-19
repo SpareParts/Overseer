@@ -1,26 +1,12 @@
 <?php
 namespace SpareParts\Overseer;
 
+use SpareParts\Overseer\Voter\ISingleVoterResult;
 
-interface IVotingResult
+interface IVotingResult extends IResult
 {
 	/**
-	 * Voting result
+	 * @return ISingleVoterResult[]
 	 */
-	const
-		ALLOW = 'allow',
-		DENY = 'deny';
-
-
-	/**
-	 * @return bool
-	 */
-	public function isAllowed();
-
-
-
-	/**
-	 * @return mixed|null
-	 */
-	public function getReason();
+	public function getPartialResults();
 }

@@ -2,9 +2,9 @@
 namespace SpareParts\Overseer\Tests\Assembly;
 
 use SpareParts\Overseer\Assembly\VotingAssembly;
-use SpareParts\Overseer\Identity\IdentityContext;
-use SpareParts\Overseer\Identity\IVotingContext;
-use SpareParts\Overseer\Strategy;
+use SpareParts\Overseer\Context\IdentityContext;
+use SpareParts\Overseer\Context\IVotingContext;
+use SpareParts\Overseer\StrategyEnum;
 use SpareParts\Overseer\Voter\IVotingSubject;
 
 class AssemblyTest extends \PHPUnit_Framework_TestCase
@@ -18,7 +18,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
 		$assembly = new VotingAssembly(
 			'category',
 			'read',
-			Strategy::ALLOW_UNLESS_DENIED,
+			StrategyEnum::ALLOW_UNLESS_DENIED(),
 			[]
 		);
 
@@ -34,7 +34,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
 		$assembly = new VotingAssembly(
 			'category',
 			'read',
-			Strategy::ALLOW_UNLESS_DENIED,
+			StrategyEnum::ALLOW_UNLESS_DENIED(),
 			[]
 		);
 
@@ -50,7 +50,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
 		$assembly = new VotingAssembly(
 			'category',
 			'read',
-			Strategy::ALLOW_UNLESS_DENIED,
+			StrategyEnum::ALLOW_UNLESS_DENIED(),
 			[],
 			IdentityContext::class
 		);
@@ -67,7 +67,7 @@ class AssemblyTest extends \PHPUnit_Framework_TestCase
 		$assembly = new VotingAssembly(
 			'category',
 			'read',
-			Strategy::ALLOW_UNLESS_DENIED,
+            StrategyEnum::ALLOW_UNLESS_DENIED(),
 			[]
 		);
 

@@ -1,5 +1,5 @@
 <?php
-namespace SpareParts\Overseer\Identity;
+namespace SpareParts\Overseer\Context;
 
 
 class IdentityContext implements IVotingContext

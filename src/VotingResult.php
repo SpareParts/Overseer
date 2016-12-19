@@ -1,48 +1,47 @@
 <?php
 namespace SpareParts\Overseer;
 
-
-use SpareParts\Overseer\Voter\IVoter;
+use SpareParts\Overseer\Voter\ISingleVoterResult;
 
 class VotingResult implements IVotingResult
 {
-	/**
-	 * @var string|null
-	 */
-	private $reason;
+    /**
+     * @var VotingDecisionEnum
+     */
+    private $decision;
 
-	/**
-	 * @var string
-	 */
-	private $status;
+    /**
+     * @var ISingleVoterResult[]
+     */
+    private $partialResults;
 
 
-	/**
-	 * VotingResult constructor.
-	 * @param string $status
-	 * @param string|null $reason
-	 */
-	public function __construct($status, $reason = null)
+    /**
+     * VotingResult constructor.
+     * @param VotingDecisionEnum $decision
+     * @param ISingleVoterResult[] $partialResults
+     */
+    public function __construct(VotingDecisionEnum $decision, $partialResults)
 	{
-		$this->reason = $reason;
-		$this->status = $status;
-	}
+        $this->decision = $decision;
+        $this->partialResults = $partialResults;
+    }
 
 
-	/**
-	 * @return bool
-	 */
-	public function isAllowed()
-	{
-		return $this->status === static::ALLOW;
-	}
+    /**
+     * @return VotingDecisionEnum
+     */
+    public function getDecision()
+    {
+        return $this->decision;
+    }
 
 
-	/**
-	 * @return string
-	 */
-	public function getReason()
-	{
-		return $this->reason;
-	}
+    /**
+     * @return ISingleVoterResult[]
+     */
+    public function getPartialResults()
+    {
+        return $this->partialResults;
+    }
 }
