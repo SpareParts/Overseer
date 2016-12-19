@@ -2,12 +2,12 @@
 namespace SpareParts\Overseer\Assembly;
 
 
-use SpareParts\Overseer\Identity\IVotingContext;
-use SpareParts\Overseer\IVotingResult;
-use SpareParts\Overseer\Strategy;
+use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\InvalidVotingResultException;
+use SpareParts\Overseer\StrategyEnum;
 use SpareParts\Overseer\Voter\IVoter;
 use SpareParts\Overseer\Voter\IVotingSubject;
+use SpareParts\Overseer\VotingDecisionEnum;
 use SpareParts\Overseer\VotingResult;
 
 class VotingAssembly implements IVotingAssembly
@@ -33,11 +33,6 @@ class VotingAssembly implements IVotingAssembly
 	 */
 	private $actionName;
 
-	/**
-	 * @var null|string
-	 */
-	private $contextClassname;
-
 
 	/**
 	 * VotingAssembly constructor.
@@ -45,26 +40,23 @@ class VotingAssembly implements IVotingAssembly
 	 * @param string $actionName
 	 * @param string $strategy
 	 * @param \SpareParts\Overseer\Voter\IVoter[] $voters
-	 * @param string|null $contextClassname If present, this assembly will require specific context class
 	 */
 	public function __construct(
 		$subjectName,
 		$actionName,
 		$strategy,
-		array $voters,
-		$contextClassname = IVotingContext::class
+		array $voters
 	) {
 		$this->strategy = $strategy;
 		$this->voters = $voters;
 		$this->subjectName = $subjectName;
 		$this->actionName = $actionName;
-		$this->contextClassname = $contextClassname;
 	}
 
 
 	/**
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
 	 * @return null|\SpareParts\Overseer\IVotingResult
 	 * @throws \SpareParts\Overseer\InvalidVotingResultException
 	 */
@@ -72,13 +64,13 @@ class VotingAssembly implements IVotingAssembly
 	{
 		$result = null;
 		switch ($this->strategy) {
-			case Strategy::FIRST_VOTE_DECIDES:
+			case StrategyEnum::FIRST_VOTE_DECIDES():
 				return $this->strategyFirstVoteDecides($votingSubject, $votingContext);
 
-			case Strategy::ALLOW_UNLESS_DENIED:
+			case StrategyEnum::ALLOW_UNLESS_DENIED():
 				return $this->strategyAllowUnlessDenied($votingSubject, $votingContext);
 
-			case Strategy::DENY_UNLESS_ALLOWED:
+			case StrategyEnum::DENY_UNLESS_ALLOWED():
 				return $this->strategyDenyUnlessAllowed($votingSubject, $votingContext);
 
 			default:
@@ -89,15 +81,15 @@ class VotingAssembly implements IVotingAssembly
 
 	/**
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
 	 * @return \SpareParts\Overseer\IVotingResult
 	 * @throws \SpareParts\Overseer\InvalidVotingResultException
 	 */
 	private function strategyFirstVoteDecides(IVotingSubject $votingSubject, IVotingContext $votingContext)
 	{
-		foreach ($this->voters as $name => $voter) {
-			if (($result = $voter->vote($votingSubject, $votingContext)) !== null) {
-				return $this->prepareResult($name, $result);
+		foreach ($this->voters as $voter) {
+			if (($lastResult = $voter->vote($votingSubject, $votingContext)) !== null) {
+                return new VotingResult($lastResult->getDecision(), [$lastResult]);
 			}
 		}
 		throw new InvalidVotingResultException('Voting assembly did not decide on any result!');
@@ -106,77 +98,52 @@ class VotingAssembly implements IVotingAssembly
 
 	/**
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
 	 * @return \SpareParts\Overseer\IVotingResult
 	 */
 	private function strategyAllowUnlessDenied($votingSubject, $votingContext)
 	{
+	    $results = [];
 		foreach ($this->voters as $name => $voter) {
-			if (($result = $voter->vote($votingSubject, $votingContext)) !== null) {
-				$vote = $this->prepareResult($name, $result);
-				// at least one voter denied access
-				if (!$vote->isAllowed()) {
-					return $vote;
-				}
+			if (($lastResult = $voter->vote($votingSubject, $votingContext)) !== null) {
+                $results[] = $lastResult;
+			    if ($lastResult->getDecision() == VotingDecisionEnum::DENIED()) {
+                    return new VotingResult(VotingDecisionEnum::DENIED(), $results);
+                }
 			}
 		}
-		return new VotingResult(IVotingResult::ALLOW);
+		return new VotingResult(VotingDecisionEnum::ALLOWED(), $results);
 	}
 
 
 	/**
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
 	 * @return \SpareParts\Overseer\IVotingResult
 	 */
 	private function strategyDenyUnlessAllowed($votingSubject, $votingContext)
 	{
-		foreach ($this->voters as $name => $voter) {
-			if (($result = $voter->vote($votingSubject, $votingContext)) !== null) {
-				$vote = $this->prepareResult($name, $result);
-				// at least one voter allowed access
-				if ($vote->isAllowed()) {
-					return $vote;
-				}
-			}
-		}
-		return new VotingResult(IVotingResult::DENY);
-	}
-
-
-	/**
-	 * @param string $voterName
-	 * @param string|IVotingResult $partialResult
-	 * @return \SpareParts\Overseer\IVotingResult|null
-	 * @throws \SpareParts\Overseer\InvalidVotingResultException
-	 */
-	protected function prepareResult($voterName, $partialResult)
-	{
-		if (is_null($partialResult)) {
-			return null;
-		}
-		if (is_string($partialResult)) {
-			return new VotingResult($partialResult, $voterName);
-		}
-		if (!($partialResult instanceof IVotingResult)) {
-			throw new InvalidVotingResultException('Expected bool or IVotingResult, got '.(string)$partialResult);
-		}
-		return $partialResult;
+        $results = [];
+        foreach ($this->voters as $name => $voter) {
+            if (($lastResult = $voter->vote($votingSubject, $votingContext)) !== null) {
+                $results[] = $lastResult;
+                if ($lastResult->getDecision() == VotingDecisionEnum::DENIED()) {
+                    return new VotingResult(VotingDecisionEnum::ALLOWED(), $results);
+                }
+            }
+        }
+        return new VotingResult(VotingDecisionEnum::DENIED(), $results);
 	}
 
 
 	/**
 	 * @param string $actionName
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $subject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $context
+	 * @param \SpareParts\Overseer\Context\IVotingContext $context
 	 * @return bool
 	 */
 	public function canVoteOn($actionName, IVotingSubject $subject, IVotingContext $context)
 	{
-		if ($this->contextClassname && !($context instanceof $this->contextClassname)) {
-			return false;
-		}
-
 		if ($subject->getVotingSubjectName() === $this->subjectName && $actionName === $this->actionName) {
 			return true;
 		}

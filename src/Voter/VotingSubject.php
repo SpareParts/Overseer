@@ -7,14 +7,14 @@ namespace SpareParts\Overseer\Voter;
 class VotingSubject implements IVotingSubject
 {
 	/**
-	 * @var string
+	 * @var mixed
 	 */
 	private $subject;
 
 
 	/**
 	 * VotingSubject constructor.
-	 * @param string $subject
+	 * @param mixed $subject
 	 */
 	public function __construct($subject)
 	{
@@ -27,6 +27,12 @@ class VotingSubject implements IVotingSubject
 	 */
 	public function getVotingSubjectName()
 	{
-		return $this->subject;
+	    if (is_string($this->subject)) {
+            return $this->subject;
+        }
+        if (is_object($this->subject)) {
+            return get_class($this->subject);
+        }
+		return (string) $this->subject;
 	}
 }

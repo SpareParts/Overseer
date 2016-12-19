@@ -1,12 +1,10 @@
 <?php
 namespace SpareParts\Overseer\Voter;
 
+use SpareParts\Overseer\Context\IVotingContext;
+use SpareParts\Overseer\VotingDecisionEnum;
 
-use SpareParts\Overseer\Identity\IVotingContext;
-use SpareParts\Overseer\InvalidArgumentException;
-use SpareParts\Overseer\IVotingResult;
-
-class RoleVoter implements IVoter
+final class RoleVoter implements IVoter
 {
 	/**
 	 * @var string[]
@@ -14,36 +12,39 @@ class RoleVoter implements IVoter
 	private $allowedRoles;
 
 	/**
-	 * @var string
-	 */
-	private $purpose;
+     * @var VotingDecisionEnum
+     */
+    private $resultDecision;
+
+    /**
+     * @var mixed|null
+     */
+    private $reason;
 
 
-	/**
-	 * RoleVoter constructor.
-	 * @param string $purpose
-	 * @param string|string[] $allowedRoles
-	 */
-	public function __construct($purpose, $allowedRoles)
+    /**
+     * RoleVoter constructor.
+     * @param VotingDecisionEnum $resultDecision
+     * @param string|string[] $allowedRoles
+     * @param mixed $reason
+     */
+	public function __construct(VotingDecisionEnum $resultDecision, $allowedRoles, $reason = null)
 	{
-		if (!in_array($purpose, [IVotingResult::ALLOW, IVotingResult::DENY ])) {
-			throw new InvalidArgumentException(sprintf("Wrong voting purpose for this voter: got %s, expected one of allow, deny.", $purpose));
-		}
-
-		$this->purpose = $purpose;
 		$this->allowedRoles = (array) $allowedRoles;
-	}
+        $this->resultDecision = $resultDecision;
+        $this->reason = $reason;
+    }
 
 
 	/**
 	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Identity\IVotingContext $votingContext
-	 * @return string|null|IVotingResult
+	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+	 * @return ISingleVoterResult
 	 */
 	public function vote(IVotingSubject $votingSubject, IVotingContext $votingContext)
 	{
 		if (array_intersect($votingContext->getRoles(), $this->allowedRoles)) {
-			return $this->purpose;
+			return new SingleVoterResult($this->resultDecision, $this->reason);
 		}
 		return null;
 	}
