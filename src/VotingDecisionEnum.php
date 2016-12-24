@@ -34,7 +34,7 @@ final class VotingDecisionEnum
      */
     public static function DENIED()
     {
-        return static::instance('allowed');
+        return static::instance('denied');
     }
 
 
