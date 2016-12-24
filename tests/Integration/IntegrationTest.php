@@ -54,7 +54,6 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
     public function strategyFirstVoteDecidesWorksCorrectly(DummyArticle $article, IVotingContext $context, VotingDecisionEnum $decision, $reason)
     {
         $result = $this->manager->vote('read', $article, $context);
-//        var_dump($result->getDecision(), $decision);
         $this->assertSame($decision, $result->getDecision());
         $this->assertSame($reason, $result->getPartialResults()[0]->getReason());
     }

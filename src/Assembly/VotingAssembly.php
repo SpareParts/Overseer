@@ -107,7 +107,7 @@ class VotingAssembly implements IVotingAssembly
 		foreach ($this->voters as $name => $voter) {
 			if (($lastResult = $voter->vote($votingSubject, $votingContext)) !== null) {
                 $results[] = $lastResult;
-			    if ($lastResult->getDecision() == VotingDecisionEnum::DENIED()) {
+			    if ($lastResult->getDecision() === VotingDecisionEnum::DENIED()) {
                     return new VotingResult(VotingDecisionEnum::DENIED(), $results);
                 }
 			}
@@ -127,7 +127,7 @@ class VotingAssembly implements IVotingAssembly
         foreach ($this->voters as $name => $voter) {
             if (($lastResult = $voter->vote($votingSubject, $votingContext)) !== null) {
                 $results[] = $lastResult;
-                if ($lastResult->getDecision() == VotingDecisionEnum::DENIED()) {
+                if ($lastResult->getDecision() === VotingDecisionEnum::ALLOWED()) {
                     return new VotingResult(VotingDecisionEnum::ALLOWED(), $results);
                 }
             }
