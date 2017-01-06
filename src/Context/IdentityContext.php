@@ -2,7 +2,7 @@
 namespace SpareParts\Overseer\Context;
 
 
-class IdentityContext implements IVotingContext
+class IdentityContext implements IIdentityContext
 {
 
 	/**
