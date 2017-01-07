@@ -2,8 +2,6 @@
 namespace SpareParts\Overseer;
 
 use SpareParts\Overseer\Context\IVotingContext;
-use SpareParts\Overseer\Voter\IVotingSubject;
-use SpareParts\Overseer\Voter\VotingSubject;
 
 /**
  * Default implementation.
@@ -16,19 +14,15 @@ use SpareParts\Overseer\Voter\VotingSubject;
 final class GenericVotingManager extends AbstractVotingManager
 {
 
-	/**
-	 * @param string $action
-	 * @param \SpareParts\Overseer\Voter\IVotingSubject|mixed $votingSubject
-	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
-	 * @return \SpareParts\Overseer\IVotingResult
-	 * @throws \SpareParts\Overseer\InvalidVotingResultException
-	 */
-	public function vote($action, $votingSubject, IVotingContext $votingContext)
-	{
-        if (!($votingSubject instanceof IVotingSubject)) {
-            $votingSubject = new VotingSubject($votingSubject);
-        }
-
+    /**
+     * @param string $action
+     * @param mixed $votingSubject
+     * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+     * @return \SpareParts\Overseer\IVotingResult
+     * @throws \SpareParts\Overseer\InvalidVotingResultException
+     */
+    public function vote($action, $votingSubject, IVotingContext $votingContext)
+    {
         return $this->innerVote($action, $votingSubject, $votingContext);
-	}
+    }
 }

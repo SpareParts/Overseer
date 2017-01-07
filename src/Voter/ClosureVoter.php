@@ -8,39 +8,39 @@ use SpareParts\Overseer\VotingDecisionEnum;
 
 class ClosureVoter implements IVoter
 {
-	/**
-	 * @var \Closure
-	 */
-	private $authorizationClosure;
+    /**
+     * @var \Closure
+     */
+    private $authorizationClosure;
 
 
-	/**
-	 * ClosureVoter constructor.
-	 * @param \Closure $authorizationClosure
-	 */
-	public function __construct(\Closure $authorizationClosure)
-	{
-		$this->authorizationClosure = $authorizationClosure;
-	}
+    /**
+     * ClosureVoter constructor.
+     * @param \Closure $authorizationClosure
+     */
+    public function __construct(\Closure $authorizationClosure)
+    {
+        $this->authorizationClosure = $authorizationClosure;
+    }
 
 
-	/**
-	 * @param mixed $votingSubject
-	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
-	 * @return ISingleVoterResult
-	 */
-	public function vote($votingSubject, IVotingContext $votingContext)
-	{
-		$closure = $this->authorizationClosure;
-		$result = $closure($votingSubject, $votingContext);
+    /**
+     * @param mixed $votingSubject
+     * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+     * @return ISingleVoterResult
+     */
+    public function vote($votingSubject, IVotingContext $votingContext)
+    {
+        $closure = $this->authorizationClosure;
+        $result = $closure($votingSubject, $votingContext);
 
         $result = $this->prepareResult($result);
 
         return $result;
-	}
+    }
 
 
-	/**
+    /**
      * @param mixed $result
      * @return SingleVoterResult
      */

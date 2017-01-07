@@ -2,7 +2,9 @@
 namespace SpareParts\Overseer\Tests\Integration;
 
 
+use SpareParts\Overseer\Assembly\VotingAbilityAwareAssembly;
 use SpareParts\Overseer\Assembly\VotingAssembly;
+use SpareParts\Overseer\Context\IIdentityContext;
 use SpareParts\Overseer\GenericVotingManager;
 use SpareParts\Overseer\Context\IdentityContext;
 use SpareParts\Overseer\Context\IVotingContext;
@@ -15,16 +17,18 @@ use SpareParts\Overseer\VotingDecisionEnum;
 class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @var GenericVotingManager
-     */
-    private $manager;
 
-    public function setUp()
+    /**
+     * @param DummyArticle $article
+     * @param IVotingContext $context
+     * @param VotingDecisionEnum $decision
+     * @param string $reason
+     * @test
+     * @dataProvider fvdDataProvider
+     */
+    public function strategyFirstVoteDecidesWorksCorrectly(DummyArticle $article, IVotingContext $context, VotingDecisionEnum $decision, $reason)
     {
-        $assembly1 = new VotingAssembly(
-            'article',
-            'read',
+        $assembly1 = new VotingAbilityAwareAssembly(
             StrategyEnum::FIRST_VOTE_DECIDES(),
             [
                 new RoleVoter(VotingDecisionEnum::ALLOWED(), 'admin', 'is_admin'),
@@ -34,26 +38,17 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
                     }
                 }),
                 new RoleVoter(VotingDecisionEnum::ALLOWED(), 'user', 'is_user'),
-            ]
+            ],
+            'read',
+            IIdentityContext::class,
+            DummyArticle::class
         );
 
-        $this->manager = new GenericVotingManager([
+        $manager = new GenericVotingManager([
             $assembly1
         ]);
-    }
 
-
-    /**
-     * @param DummyArticle $article
-     * @param IVotingContext $context
-     * @param VotingDecisionEnum $decision
-     * @param $reason
-     * @test
-     * @dataProvider fvdDataProvider
-     */
-    public function strategyFirstVoteDecidesWorksCorrectly(DummyArticle $article, IVotingContext $context, VotingDecisionEnum $decision, $reason)
-    {
-        $result = $this->manager->vote('read', $article, $context);
+        $result = $manager->vote('read', $article, $context);
         $this->assertSame($decision, $result->getDecision());
         $this->assertSame($reason, $result->getPartialResults()[0]->getReason());
     }

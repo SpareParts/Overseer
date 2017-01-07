@@ -1,17 +1,19 @@
 <?php
 namespace SpareParts\Overseer\Voter;
 
+use SpareParts\Overseer\Context\IIdentityContext;
 use SpareParts\Overseer\Context\IVotingContext;
+use SpareParts\Overseer\InvalidArgumentException;
 use SpareParts\Overseer\VotingDecisionEnum;
 
 final class RoleVoter implements IVoter
 {
-	/**
-	 * @var string[]
-	 */
-	private $allowedRoles;
+    /**
+     * @var string[]
+     */
+    private $allowedRoles;
 
-	/**
+    /**
      * @var VotingDecisionEnum
      */
     private $resultDecision;
@@ -28,24 +30,28 @@ final class RoleVoter implements IVoter
      * @param string|string[] $allowedRoles
      * @param mixed $reason
      */
-	public function __construct(VotingDecisionEnum $resultDecision, $allowedRoles, $reason = null)
-	{
-		$this->allowedRoles = (array) $allowedRoles;
+    public function __construct(VotingDecisionEnum $resultDecision, $allowedRoles, $reason = null)
+    {
+        $this->allowedRoles = (array) $allowedRoles;
         $this->resultDecision = $resultDecision;
         $this->reason = $reason;
     }
 
 
-	/**
-	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
-	 * @return ISingleVoterResult
-	 */
-	public function vote(IVotingSubject $votingSubject, IVotingContext $votingContext)
-	{
-		if (array_intersect($votingContext->getRoles(), $this->allowedRoles)) {
-			return new SingleVoterResult($this->resultDecision, $this->reason);
-		}
-		return null;
-	}
+    /**
+     * @param mixed $votingSubject
+     * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+     * @return ISingleVoterResult
+     */
+    public function vote($votingSubject, IVotingContext $votingContext)
+    {
+        if (!($votingContext instanceof IIdentityContext)) {
+            throw new InvalidArgumentException('RoleVoter can be used only with specific voting context, implementing IIdentityContext.');
+        }
+
+        if (array_intersect($votingContext->getRoles(), $this->allowedRoles)) {
+            return new SingleVoterResult($this->resultDecision, $this->reason);
+        }
+        return null;
+    }
 }

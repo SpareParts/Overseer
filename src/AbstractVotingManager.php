@@ -1,44 +1,47 @@
 <?php
 namespace SpareParts\Overseer;
 
-use SpareParts\Overseer\Assembly\IVotingAssembly;
+use SpareParts\Overseer\Assembly\IVotingAbilityAwareAssembly;
 use SpareParts\Overseer\Context\IVotingContext;
-use SpareParts\Overseer\Voter\IVotingSubject;
 
 abstract class AbstractVotingManager
 {
-	/**
-	 * @var IVotingAssembly[]
-	 */
-	private $votingAssemblies;
+    /**
+     * @var IVotingAbilityAwareAssembly[]
+     */
+    private $votingAssemblies;
 
 
-	/**
-	 * VotingManager constructor.
-	 * @param IVotingAssembly[] $votingAssemblies
-	 */
-	public function __construct(array $votingAssemblies)
-	{
-		$this->votingAssemblies = $votingAssemblies;
-	}
+    /**
+     * VotingManager constructor.
+     * @param IVotingAbilityAwareAssembly[] $votingAssemblies
+     */
+    public function __construct(array $votingAssemblies)
+    {
+        $this->votingAssemblies = $votingAssemblies;
+    }
 
 
-	/**
-	 * @param string $action
-	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
-	 * @return \SpareParts\Overseer\IVotingResult
-	 * @throws \SpareParts\Overseer\InvalidVotingResultException
-	 */
-	protected function innerVote($action, IVotingSubject $votingSubject, IVotingContext $votingContext)
-	{
-		foreach ($this->votingAssemblies as $votingAssembly) {
-			if ($votingAssembly->canVoteOn($action, $votingSubject, $votingContext)) {
-				return $votingAssembly->commenceVote($votingSubject, $votingContext);
-			}
-		}
+    /**
+     * @param string $action
+     * @param mixed $votingSubject
+     * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+     * @return \SpareParts\Overseer\IVotingResult
+     * @throws \SpareParts\Overseer\InvalidVotingResultException
+     */
+    protected function innerVote($action, $votingSubject, IVotingContext $votingContext)
+    {
+        foreach ($this->votingAssemblies as $votingAssembly) {
+            if (!($votingAssembly instanceof IVotingAbilityAwareAssembly)) {
+                throw new InvalidArgumentException('Voting assemblies provided to voting manager must implement IVotingAbilityAwareAssembly interface!');
+            }
 
-		throw new InvalidVotingResultException('No voting assembly for subject::action: '.
-			$votingSubject->getVotingSubjectName().'::'.$action);
-	}
+            if ($votingAssembly->canVoteOn($action, $votingSubject, $votingContext)) {
+                return $votingAssembly->commenceVote($votingSubject, $votingContext);
+            }
+        }
+
+        throw new InvalidVotingResultException('No voting assembly for subject::action: '.
+            (string) $votingSubject.'::'.$action);
+    }
 }
