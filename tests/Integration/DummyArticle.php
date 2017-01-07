@@ -2,9 +2,8 @@
 namespace SpareParts\Overseer\Tests\Integration;
 
 
-use SpareParts\Overseer\Voter\IVotingSubject;
 
-class DummyArticle implements IVotingSubject
+class DummyArticle
 {
 
     /**
@@ -27,13 +26,5 @@ class DummyArticle implements IVotingSubject
     public function isBanned()
     {
         return $this->isBanned;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVotingSubjectName()
-    {
-        return 'article';
     }
 }

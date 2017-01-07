@@ -4,44 +4,43 @@ namespace SpareParts\Overseer\Voter;
 
 
 use SpareParts\Overseer\Context\IVotingContext;
-use SpareParts\Overseer\IVotingResult;
 use SpareParts\Overseer\VotingDecisionEnum;
 
-final class ClosureVoter implements IVoter
+class ClosureVoter implements IVoter
 {
-	/**
-	 * @var \Closure
-	 */
-	private $authorizationClosure;
+    /**
+     * @var \Closure
+     */
+    private $authorizationClosure;
 
 
-	/**
-	 * ClosureVoter constructor.
-	 * @param \Closure $authorizationClosure
-	 */
-	public function __construct(\Closure $authorizationClosure)
-	{
-		$this->authorizationClosure = $authorizationClosure;
-	}
+    /**
+     * ClosureVoter constructor.
+     * @param \Closure $authorizationClosure
+     */
+    public function __construct(\Closure $authorizationClosure)
+    {
+        $this->authorizationClosure = $authorizationClosure;
+    }
 
 
-	/**
-	 * @param \SpareParts\Overseer\Voter\IVotingSubject $votingSubject
-	 * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
-	 * @return ISingleVoterResult
-	 */
-	public function vote(IVotingSubject $votingSubject, IVotingContext $votingContext)
-	{
-		$closure = $this->authorizationClosure;
-		$result = $closure($votingSubject, $votingContext);
+    /**
+     * @param mixed $votingSubject
+     * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+     * @return ISingleVoterResult
+     */
+    public function vote($votingSubject, IVotingContext $votingContext)
+    {
+        $closure = $this->authorizationClosure;
+        $result = $closure($votingSubject, $votingContext);
 
         $result = $this->prepareResult($result);
 
         return $result;
-	}
+    }
 
 
-	/**
+    /**
      * @param mixed $result
      * @return SingleVoterResult
      */

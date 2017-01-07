@@ -1,80 +1,129 @@
 <?php
 namespace SpareParts\Overseer\Tests\Assembly;
 
-use SpareParts\Overseer\Assembly\VotingAssembly;
-use SpareParts\Overseer\Context\IdentityContext;
+use SpareParts\Overseer\Assembly\VotingAbilityAwareAssembly;
+use SpareParts\Overseer\Context\IIdentityContext;
 use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\StrategyEnum;
-use SpareParts\Overseer\Voter\IVotingSubject;
 
-class VotingAssemblyTest extends \PHPUnit_Framework_TestCase
+class VotingAbilityAwareAssemblyCanVoteOnTest extends \PHPUnit_Framework_TestCase
 {
-	/**
-	 * @var VotingAssembly
-	 */
-	private $assembly;
 
 
-	/**
-	 * @test
-	 */
-	public function canVoteOnPass()
-	{
-		$result = $this->assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext(1, ['alchemist']));
-		$this->assertTrue($result);
-	}
+    /**
+     * @test
+     */
+    public function canVoteOnPass()
+    {
+        $assembly = new VotingAbilityAwareAssembly(
+            StrategyEnum::ALLOW_UNLESS_DENIED(),
+            [],
+            'read',
+            IVotingContext::class,
+            'SomeKindOfArticle'
+        );
 
-	/**
-	 * @test
-	 */
-	public function canVoteOnRejectsSubject()
-	{
-		$result = $this->assembly->canVoteOn('read', $this->prepareSubject('product'), $this->prepareContext(1, ['alchemist']));
-		$this->assertFalse($result);
-	}
+        $result = $assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext());
+        $this->assertTrue($result);
+    }
 
-	/**
-	 * @test
-	 */
-	public function canVoteOnRejectsAction()
-	{
-		$result = $this->assembly->canVoteOn('write', $this->prepareSubject('category'), $this->prepareContext(1, ['alchemist']));
-		$this->assertFalse($result);
-	}
+    /**
+     * @test
+     */
+    public function canVoteOnRejectsSubject()
+    {
+        $assembly = new VotingAbilityAwareAssembly(
+            StrategyEnum::ALLOW_UNLESS_DENIED(),
+            [],
+            'read',
+            IIdentityContext::class,
+            'SomeKindOfArticle'
+        );
 
-	/**
-	 * @param string $subject
-	 *
-	 * @return \Mockery\MockInterface|IVotingSubject
-	 */
-	private function prepareSubject($subject)
-	{
-		$subject = \Mockery::mock(IVotingSubject::class)
-			->shouldReceive('getVotingSubjectName')->andReturn($subject)->getMock();
-		return $subject;
-	}
+        $result = $assembly->canVoteOn('read', $this->prepareSubject('product'), $this->prepareContext());
+        $this->assertFalse($result);
+    }
 
-	/**
-	 * @param mixed $id
-	 * @param string[] $roles
-	 *
-	 * @return \Mockery\MockInterface|IVotingContext
-	 */
-	private function prepareContext($id, $roles)
-	{
-		$context = \Mockery::mock(IVotingContext::class)
-			->shouldReceive('getId')->andReturn($id)->getMock()
-			->shouldReceive('getRoles')->andReturn($roles)->getMock();
-		return $context;
-	}
+    /**
+     * @test
+     */
+    public function canVoteOnRejectsAction()
+    {
+        $assembly = new VotingAbilityAwareAssembly(
+            StrategyEnum::ALLOW_UNLESS_DENIED(),
+            [],
+            'read',
+            IVotingContext::class,
+            'SomeKindOfArticle'
+        );
 
-	public function setUp()
-	{
-		$this->assembly = new VotingAssembly(
-			'category',
-			'read',
-			StrategyEnum::ALLOW_UNLESS_DENIED(),
-			[]
-		);
-	}
+        $result = $assembly->canVoteOn('write', $this->prepareSubject('category'), $this->prepareContext());
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function canVoteOnRejectsContext()
+    {
+        $assembly = new VotingAbilityAwareAssembly(
+            StrategyEnum::ALLOW_UNLESS_DENIED(),
+            [],
+            'read',
+            IIdentityContext::class,
+            'SomeKindOfArticle'
+        );
+
+        $result = $assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext());
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function canVoteOnWorksWithMultipleActions()
+    {
+        $assembly = new VotingAbilityAwareAssembly(
+            StrategyEnum::ALLOW_UNLESS_DENIED(),
+            [],
+            ['read', 'write'],
+            IVotingContext::class,
+            'SomeKindOfArticle'
+        );
+
+        $result = $assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext());
+        $this->assertTrue($result);
+        $result = $assembly->canVoteOn('write', $this->prepareSubject('category'), $this->prepareContext());
+        $this->assertTrue($result);
+        $result = $assembly->canVoteOn('delete', $this->prepareSubject('category'), $this->prepareContext());
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return \Mockery\MockInterface|SomeKindOfArticle
+     */
+    private function prepareSubject($subject)
+    {
+        $subject = \Mockery::mock('SomeKindOfArticle');
+        return $subject;
+    }
+
+    /**
+     * @param mixed $id
+     * @param string[] $roles
+     *
+     * @return \Mockery\MockInterface|IVotingContext
+     */
+    private function prepareContext()
+    {
+        $context = \Mockery::mock(IVotingContext::class);
+        return $context;
+    }
+
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
 }
