@@ -103,9 +103,6 @@ class VotingAssemblyCommenceVoteAllowUnlessDeniedTest extends \PHPUnit_Framework
     }
 
     /**
-     * @param mixed $id
-     * @param string[] $roles
-     *
      * @return \Mockery\MockInterface|IVotingContext
      */
     private function prepareContext()

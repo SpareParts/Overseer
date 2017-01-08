@@ -12,7 +12,7 @@ class StrategyEnum
     /**
      * @var self[]
      */
-    static private $registry = [];
+    static protected $registry = [];
 
     private function __construct($value)
     {
@@ -48,10 +48,28 @@ class StrategyEnum
 
 
     /**
-     * @param $string
      * @return self
      */
-    private static function instance($string)
+    public static function EVERYONE_MUST_ALLOW_TO_BE_ALLOWED()
+    {
+        return static::instance('everyone_must_allow_to_be_allowed');
+    }
+
+
+    /**
+     * @return self
+     */
+    public static function EVERYONE_MUST_DENY_TO_BE_DENIED()
+    {
+        return static::instance('everyone_must_deny_to_be_denied');
+    }
+
+
+    /**
+     * @param string $string
+     * @return self
+     */
+    protected static function instance($string)
     {
         if (!isset(static::$registry[$string])) {
             static::$registry[$string] = new static($string);

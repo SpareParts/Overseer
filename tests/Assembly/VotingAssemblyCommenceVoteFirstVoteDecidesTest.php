@@ -126,9 +126,6 @@ class VotingAssemblyCommenceVoteFirstVoteDecidesTest extends \PHPUnit_Framework_
     }
 
     /**
-     * @param mixed $id
-     * @param string[] $roles
-     *
      * @return \Mockery\MockInterface|IVotingContext
      */
     private function prepareContext()
