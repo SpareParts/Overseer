@@ -5,6 +5,7 @@ namespace SpareParts\Overseer\Assembly;
 use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\InvalidVotingResultException;
 use SpareParts\Overseer\StrategyEnum;
+use SpareParts\Overseer\Voter\ISingleVoterResult;
 use SpareParts\Overseer\Voter\IVoter;
 use SpareParts\Overseer\VotingDecisionEnum;
 use SpareParts\Overseer\VotingResult;
@@ -43,7 +44,6 @@ class VotingAssembly implements IVotingAssembly
      */
     public function commenceVote($votingSubject, IVotingContext $votingContext)
     {
-        $result = null;
         switch ($this->strategy) {
             case StrategyEnum::FIRST_VOTE_DECIDES():
                 return $this->strategyFirstVoteDecides($votingSubject, $votingContext);
@@ -53,6 +53,12 @@ class VotingAssembly implements IVotingAssembly
 
             case StrategyEnum::DENY_UNLESS_ALLOWED():
                 return $this->strategyDenyUnlessAllowed($votingSubject, $votingContext);
+
+            case StrategyEnum::EVERYONE_MUST_ALLOW_TO_BE_ALLOWED():
+                return $this->strategyEveryoneMustComply($votingSubject, $votingContext, VotingDecisionEnum::ALLOWED(), VotingDecisionEnum::DENIED());
+
+            case StrategyEnum::EVERYONE_MUST_DENY_TO_BE_DENIED():
+                return $this->strategyEveryoneMustComply($votingSubject, $votingContext, VotingDecisionEnum::DENIED(), VotingDecisionEnum::ALLOWED());
 
             default:
                 throw new InvalidVotingResultException('Unable to decide on result, invalid strategy: '.$this->strategy);
@@ -114,5 +120,34 @@ class VotingAssembly implements IVotingAssembly
             }
         }
         return new VotingResult(VotingDecisionEnum::DENIED(), $results);
+    }
+
+
+    /**
+     * @param mixed $votingSubject
+     * @param \SpareParts\Overseer\Context\IVotingContext $votingContext
+     * @param \SpareParts\Overseer\VotingDecisionEnum $defaultDecision
+     * @param \SpareParts\Overseer\VotingDecisionEnum $counterDecision
+     *
+     * @return \SpareParts\Overseer\VotingResult
+     */
+    private function strategyEveryoneMustComply(
+        $votingSubject,
+        IVotingContext $votingContext,
+        VotingDecisionEnum $defaultDecision,
+        VotingDecisionEnum $counterDecision
+    ) {
+        $results = [];
+        $decision = $defaultDecision;
+        foreach ($this->voters as $voter) {
+            $result = $voter->vote($votingSubject, $votingContext);
+            if ($result instanceof ISingleVoterResult) {
+                if ($result->getDecision() !== $defaultDecision) {
+                    $decision = $counterDecision;
+                }
+                $results[] = $result;
+            }
+        }
+        return new VotingResult($decision, $results);
     }
 }

@@ -12,7 +12,7 @@ final class VotingDecisionEnum
     /**
      * @var self[]
      */
-    static private $registry = [];
+    static protected $registry = [];
 
     private function __construct($value)
     {
@@ -39,10 +39,10 @@ final class VotingDecisionEnum
 
 
     /**
-     * @param $string
+     * @param string $string
      * @return self
      */
-    private static function instance($string)
+    protected static function instance($string)
     {
         if (!isset(static::$registry[$string])) {
             static::$registry[$string] = new static($string);
