@@ -2,7 +2,6 @@
 namespace SpareParts\Overseer\Assembly;
 
 
-use SpareParts\Overseer\Context\IIdentityContext;
 use SpareParts\Overseer\Context\IVotingContext;
 use SpareParts\Overseer\StrategyEnum;
 use SpareParts\Overseer\Voter\IVoter;
@@ -37,8 +36,8 @@ class VotingAbilityAwareAssembly extends VotingAssembly implements IVotingAbilit
         StrategyEnum $strategy,
         array $voters,
         $actions = null,
-        $contextClassName = IIdentityContext::class,
-        $subjectClassName = null
+        $subjectClassName = null,
+        $contextClassName = null
     ) {
         parent::__construct($strategy, $voters);
 

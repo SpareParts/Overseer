@@ -4,7 +4,8 @@
     "keywords":    ["acl", "attribute authorization", "authorization manager"],
     "license":     "MIT",
     "require": {
-        "php":  ">=5.5.0"
+        "php":  ">=5.5.0",
+        "spareparts/enum": "*@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "~4",
