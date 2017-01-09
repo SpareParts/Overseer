@@ -40,8 +40,8 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
                 new RoleVoter(VotingDecisionEnum::ALLOWED(), 'user', 'is_user'),
             ],
             'read',
-            IIdentityContext::class,
-            DummyArticle::class
+            DummyArticle::class,
+            IIdentityContext::class
         );
 
         $manager = new GenericVotingManager([

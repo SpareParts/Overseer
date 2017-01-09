@@ -19,8 +19,8 @@ class VotingAbilityAwareAssemblyCanVoteOnTest extends \PHPUnit_Framework_TestCas
             StrategyEnum::ALLOW_UNLESS_DENIED(),
             [],
             'read',
-            IVotingContext::class,
-            'SomeKindOfArticle'
+            'SomeKindOfArticle',
+            IVotingContext::class
         );
 
         $result = $assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext());
@@ -36,8 +36,8 @@ class VotingAbilityAwareAssemblyCanVoteOnTest extends \PHPUnit_Framework_TestCas
             StrategyEnum::ALLOW_UNLESS_DENIED(),
             [],
             'read',
-            IIdentityContext::class,
-            'SomeKindOfArticle'
+            'SomeKindOfArticle',
+            IIdentityContext::class
         );
 
         $result = $assembly->canVoteOn('read', $this->prepareSubject('product'), $this->prepareContext());
@@ -53,8 +53,8 @@ class VotingAbilityAwareAssemblyCanVoteOnTest extends \PHPUnit_Framework_TestCas
             StrategyEnum::ALLOW_UNLESS_DENIED(),
             [],
             'read',
-            IVotingContext::class,
-            'SomeKindOfArticle'
+            'SomeKindOfArticle',
+            IVotingContext::class
         );
 
         $result = $assembly->canVoteOn('write', $this->prepareSubject('category'), $this->prepareContext());
@@ -70,8 +70,8 @@ class VotingAbilityAwareAssemblyCanVoteOnTest extends \PHPUnit_Framework_TestCas
             StrategyEnum::ALLOW_UNLESS_DENIED(),
             [],
             'read',
-            IIdentityContext::class,
-            'SomeKindOfArticle'
+            'SomeKindOfArticle',
+            IIdentityContext::class
         );
 
         $result = $assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext());
@@ -87,8 +87,8 @@ class VotingAbilityAwareAssemblyCanVoteOnTest extends \PHPUnit_Framework_TestCas
             StrategyEnum::ALLOW_UNLESS_DENIED(),
             [],
             ['read', 'write'],
-            IVotingContext::class,
-            'SomeKindOfArticle'
+            'SomeKindOfArticle',
+            IVotingContext::class
         );
 
         $result = $assembly->canVoteOn('read', $this->prepareSubject('category'), $this->prepareContext());

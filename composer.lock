@@ -4,9 +4,47 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6e45d8793d5e92c949a5b688c660483e",
-    "content-hash": "65b8e9071ce7c725f116ceba5ffee044",
-    "packages": [],
+    "hash": "317fb9dda718a52ac37ef8366ad1d945",
+    "content-hash": "81e1544bcb1db2e79c82d95da5a13e03",
+    "packages": [
+        {
+            "name": "spareparts/enum",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SpareParts/Enum.git",
+                "reference": "3b2722a784bc47b0fcd600a86dcbc86285327cdb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SpareParts/Enum/zipball/3b2722a784bc47b0fcd600a86dcbc86285327cdb",
+                "reference": "3b2722a784bc47b0fcd600a86dcbc86285327cdb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.6",
+                "phpunit/phpunit": "~4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SpareParts\\Enum\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Simple ENUM class.",
+            "keywords": [
+                "enum"
+            ],
+            "time": "2017-01-09 08:56:24"
+        }
+    ],
     "packages-dev": [
         {
             "name": "doctrine/instantiator",
@@ -109,16 +147,16 @@
         },
         {
             "name": "mockery/mockery",
-            "version": "0.9.6",
+            "version": "0.9.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padraic/mockery.git",
-                "reference": "65d4ca18e15cb02eeb1e5336f884e46b9b905be0"
+                "reference": "4de7969f4664da3cef1ccd83866c9f59378c3371"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padraic/mockery/zipball/65d4ca18e15cb02eeb1e5336f884e46b9b905be0",
-                "reference": "65d4ca18e15cb02eeb1e5336f884e46b9b905be0",
+                "url": "https://api.github.com/repos/padraic/mockery/zipball/4de7969f4664da3cef1ccd83866c9f59378c3371",
+                "reference": "4de7969f4664da3cef1ccd83866c9f59378c3371",
                 "shasum": ""
             },
             "require": {
@@ -170,7 +208,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2016-09-30 12:09:40"
+            "time": "2016-12-19 14:50:55"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -1232,7 +1270,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "spareparts/enum": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
