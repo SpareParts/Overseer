@@ -44,7 +44,7 @@ class ClosureVoter implements IVoter
      * @param mixed $result
      * @return SingleVoterResult
      */
-    public function prepareResult($result)
+    protected function prepareResult($result)
     {
         if ($result === true) {
             $result = new SingleVoterResult(VotingDecisionEnum::ALLOWED());
