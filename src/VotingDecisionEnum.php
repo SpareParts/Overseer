@@ -4,8 +4,8 @@ namespace SpareParts\Overseer;
 use SpareParts\Enum\Enum;
 
 /**
- * @method static ALLOWED
- * @method static DENIED
+ * @method static VotingDecisionEnum ALLOWED()
+ * @method static VotingDecisionEnum DENIED()
  */
 final class VotingDecisionEnum extends Enum
 {
