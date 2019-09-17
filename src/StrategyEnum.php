@@ -4,11 +4,11 @@ namespace SpareParts\Overseer;
 use SpareParts\Enum\Enum;
 
 /**
- * @method static FIRST_VOTE_DECIDES
- * @method static ALLOW_UNLESS_DENIED
- * @method static DENY_UNLESS_ALLOWED
- * @method static EVERYONE_MUST_ALLOW_TO_BE_ALLOWED
- * @method static EVERYONE_MUST_DENY_TO_BE_DENIED
+ * @method static StrategyEnum FIRST_VOTE_DECIDES()
+ * @method static StrategyEnum ALLOW_UNLESS_DENIED()
+ * @method static StrategyEnum DENY_UNLESS_ALLOWED()
+ * @method static StrategyEnum EVERYONE_MUST_ALLOW_TO_BE_ALLOWED()
+ * @method static StrategyEnum EVERYONE_MUST_DENY_TO_BE_DENIED()
  */
 final class StrategyEnum extends Enum
 {
