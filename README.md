@@ -28,24 +28,31 @@ composer require spareparts/overseer
 
 ## Basic usage
 
-Let's imagine we have an article site, and we want to make sure the admin can edit article always, it's creator only unless it's banned.
+Let's imagine we have an article site, and we want to make sure the admin can read the article always, while its author only unless it's not banned.
 
-This is how we create the voting assembly for this specific subject and action. It contains three voters, 
+This is how we create the voting assembly for this specific subject and action. It contains four voters, 
 ````
 $assembly = new VotingAssembly(
-	$subjectName = Article::class,
-	$actionName = 'edit',
-	$strategy = Strategy::FIRST_VOTE_DECIDES,
+	$subjectName = 'article',
+	$actionName = 'read',
+	$strategy = StrategyEnum::FIRST_VOTE_DECIDES(),
 	$voters = [
-		new RoleVoter(IVoteResult::ALLOW, 'admin'),
-		new ClosureVoter(function(Article $subject, IdentityContext $context) {
+		new RoleVoter(VotingDecisionEnum::ALLOWED(), 'admin'),
+		new ClosureVoter(function (DummyArticle $article, IdentityContext $context) {
 			// allow the owner to edit
 			if ($subject->ownerId === $context->getId()) {
-				return IVotingResult::ALLOW;
+				return new SingleVoterResult(VotingDecisionEnum::ALLOWED());
 			}
 			return null;
 		}),
-		new RoleVoter(IVoteResult::ALLOW, 'user'),
+		new ClosureVoter(function (DummyArticle $article) {
+			// deny access if the article is banned
+			if ($subject->isBanned()) {
+				return new SingleVoterResult(VotingDecisionEnum::ALLOWED());
+			}
+			return null;
+		}),
+		new RoleVoter(VotingDecisionEnum::ALLOWED(), 'user'),
 	]
 );
 
@@ -62,7 +69,7 @@ Now let's use it
 ```
 $context = new IdentityContext($userId, $userRoles);
 $authorized = $authorizationManager->vote('edit', $article, $context);
-if ($authorized->isAllowed()) {
+if ($authorized->getDecision() === VotingDecisionEnum::ALLOWED()) {
 	// we can edit!
 }
 ```
